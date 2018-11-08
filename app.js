@@ -3,18 +3,25 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const apiConfig = require('./api.config');
+const mongoose = require('mongoose');
+console.log(apiConfig.db)
+mongoose.connect(apiConfig.db, { useNewUrlParser: true });
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+  // we're connected!
+  console.log('connection success')
+});
 
 var cors=require('cors');
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var msgRouter = require('./routes/msg');
-
 
 var app = express();
 
 app.use(cors({
-  origin:['http://localhost:3001'],
+  origin:[apiConfig.corsUrl],
   methods:['GET','POST'], //仅允许这两种请求方式
   alloweHeaders:['Conten-Type','Authorization'] //仅允许这两种请求头
 }))
@@ -29,13 +36,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/msglist',msgRouter)
+app.all('*', indexRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  console.log(req,'req')
+  // console.log(req,'req')
   next(createError(404));
 });
 
