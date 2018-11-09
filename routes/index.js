@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var msgController = require('../controllers/msg')
-var MsgList = require('../models/msg')
+var commentsController = require('../controllers/comments')
 
 router.use(function timeLog (req, res, next) {
   console.log('Time: ', Date.now())
@@ -20,8 +20,13 @@ router
   msgController.getMyMsg(req, res)
 })
 .get('/getDetail', (req, res) => {
-  console.log(req.body)
   msgController.getDetail(req, res)
+})
+.get('/getComments', (req, res,  next) => {
+  commentsController.getComments(req, res)
+})
+.post('/addComments', (req, res,  next) => {
+  commentsController.addComments(req, res)
 })
 
 module.exports = router;

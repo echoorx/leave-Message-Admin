@@ -7,7 +7,7 @@
 // const mongoose = require('mongoose');
 // const MsgSchema = mongoose.model('MsgSchema');
 // const assign = Object.assign;
-var MsgList = require('../models/msg')
+var MsgSchema = require('../models/msg')
 
 // addMsg
 const addMsg = (req, res) => {
@@ -21,7 +21,7 @@ const addMsg = (req, res) => {
   for(let k in data) {
     if(!data[k]) return res.send({code: 500, msg: '内容不能为空'})
   }
-  MsgList.create(data, (err, user) => {
+  MsgSchema.create(data, (err, user) => {
     if (err) return res.send({msg: '服务器异常，请联系管理员',code: 500});   
     res.send({msg: 'success',code: 0})  
   })
@@ -37,9 +37,9 @@ const getAllMsg = (req, res) => {
     // skip: ( req.query.page - 1 ) * query.limit || 0 
   }
   query.skip = (query.skip - 1) * query.limit
-  MsgList.count({},(err, count) => {
+  MsgSchema.countDocuments({}, (err, count) => {
     if(err) return res.send({msg: '未知异常，请联系管理员',code: 500})
-    MsgList.find({}, null, query, (err, docs) => {
+    MsgSchema.find({}, null, query, (err, docs) => {
       if(err) return res.send({msg: '服务器异常，请联系管理员',code: 500})
       res.send({msg: 'success',code: 0, data: docs, total: count})  
     })
@@ -59,9 +59,9 @@ const getMyMsg = (req, res) => {
   query.skip = (query.skip - 1) * query.limit
   if(!data.openid) return res.send({msg: '服务器异常，请联系管理员',code: 500})
   
-  MsgList.count({openid: data.openid},(err, count) => {
+  MsgSchema.countDocuments(data, (err, count) => {
     if(err) return res.send({msg: '未知异常，请联系管理员',code: 500})
-    MsgList.find({openid: data.openid}, null, query, (err, docs) => {
+    MsgSchema.find({openid: data.openid}, null, query, (err, docs) => {
       if(err) return res.send({msg: '服务器异常，请联系管理员',code: 500})
       res.send({msg: 'success',code: 0, data: docs, total: count})  
     })
@@ -74,7 +74,7 @@ const getDetail = (req, res) => {
     id: req.query.id || '',
   }
   if(!data.id) return res.send({msg: '服务器异常，请联系管理员',code: 500})
-  MsgList.find({_id: data.id}, null, {sort: {createdAt: -1}}, (err, docs) => {
+  MsgSchema.find({_id: data.id}, null, {sort: {createdAt: -1}}, (err, docs) => {
     if(err) return res.send({msg: '服务器异常，请联系管理员',code: 500})
     res.send({msg: 'success',code: 0, data: docs})  
   })
